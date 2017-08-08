@@ -13,7 +13,7 @@ class Bot:
         ''' Get All Updates JSON format '''
         method = 'getUpdates'
         params = {'timeout':timeout, 'offset':offset}
-        response = reqeusts.get( self.api_url + method, params)
+        response = requests.get( self.api_url + method, params)
         result_json = response.json()['result']
         return result_json
 
@@ -35,10 +35,25 @@ class Bot:
         response = requests.post( self.api_url + method, params)
         return response
 
+''' Help Variables '''
+token = ''
+bot = Bot(token)
 
 ''' Main method using long polling '''
 def main():
-    pass
+    new_offset = None
+    while True:
+        bot.get_updates(new_offset)
+
+        last_update = bot.get_last_update()
+
+        last_update_id = last_update['update_id']
+        last_chat_text = last_update['message']['text']
+        last_chat_id = last_update['message']['chat']['id']
+
+        bot.send_message(last_chat_id, last_chat_text)
+
+        new_offset = last_update_id + 1
 
 if __name__ == '__main__':
     main()
