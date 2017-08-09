@@ -7,7 +7,7 @@ class Bot:
 
     def __init__(self, token):
         self.token = token
-        self.api_url = "https://api.telegram.org/bot{}".format(token)
+        self.api_url = "https://api.telegram.org/bot{}/".format(token)
 
     def get_updates(self, offset=None, timeout=30):
         ''' Get All Updates JSON format '''
@@ -35,25 +35,24 @@ class Bot:
         response = requests.post( self.api_url + method, params)
         return response
 
-''' Help Variables '''
-token = ''
-bot = Bot(token)
+bot = Bot("your_token_here")
 
-''' Main method using long polling '''
+
 def main():
     new_offset = None
+
     while True:
         bot.get_updates(new_offset)
 
         last_update = bot.get_last_update()
 
         last_update_id = last_update['update_id']
-        last_chat_text = last_update['message']['text']
         last_chat_id = last_update['message']['chat']['id']
+        last_chat_text = last_update['message']['text']
 
         bot.send_message(last_chat_id, last_chat_text)
-
         new_offset = last_update_id + 1
+
 
 if __name__ == '__main__':
     main()
