@@ -2,26 +2,23 @@
 import requests
 import datetime
 
-class BotHandler:
+class Bot:
+    ''' Bot class '''
 
     def __init__(self, token):
         self.token = token
         self.api_url = "https://api.telegram.org/bot{}/".format(token)
 
     def get_updates(self, offset=None, timeout=30):
+        ''' Get All Updates JSON format '''
         method = 'getUpdates'
-        params = {'timeout': timeout, 'offset': offset}
-        resp = requests.get(self.api_url + method, params)
-        result_json = resp.json()['result']
+        params = {'timeout':timeout, 'offset':offset}
+        response = requests.get( self.api_url + method, params)
+        result_json = response.json()['result']
         return result_json
 
-    def send_message(self, chat_id, text):
-        params = {'chat_id': chat_id, 'text': text}
-        method = 'sendMessage'
-        resp = requests.post(self.api_url + method, params)
-        return resp
-
     def get_last_update(self):
+        ''' Get Latest Update '''
         get_result = self.get_updates()
 
         if len(get_result) > 0:
@@ -31,23 +28,28 @@ class BotHandler:
 
         return last_update
 
+    def send_message(self, chat_id, text):
+        ''' Send Message '''
+        method = 'sendMessage'
+        params = {'chat_id':chat_id, 'text':text}
+        response = requests.post( self.api_url + method, params)
+        return response
+
 ''' Help Variables '''
-token = '371331492:AAG0_Ddqkvw-TJr8TxRLig6fNt8mZ1bLXmY'
-greet_bot = BotHandler(token)
-greetings = ('здравствуй', 'привет', 'ку', 'здорово')
+bot = Bot('371331492:AAG0_Ddqkvw-TJr8TxRLig6fNt8mZ1bLXmY')
+greetings = (u'здравствуй', u'привет', u'ку', u'здорово')
 now = datetime.datetime.now()
 
 ''' Main Function '''
-
 def main():
     new_offset = None
     today = now.day
     hour = now.hour
 
     while True:
-        greet_bot.get_updates(new_offset)
+        bot.get_updates(new_offset)
 
-        last_update = greet_bot.get_last_update()
+        last_update = bot.get_last_update()
 
         last_update_id = last_update['update_id']
         last_chat_text = last_update['message']['text']
@@ -55,15 +57,15 @@ def main():
         last_chat_name = last_update['message']['chat']['first_name']
 
         if last_chat_text.lower() in greetings and today == now.day and 6 <= hour < 12:
-            greet_bot.send_message(last_chat_id, 'Доброе утро, {}'.format(last_chat_name))
+            bot.send_message(last_chat_id, u'Доброе утро, {}'.format(last_chat_name))
             today += 1
 
         elif last_chat_text.lower() in greetings and today == now.day and 12 <= hour < 17:
-            greet_bot.send_message(last_chat_id, 'Добрый день, {}'.format(last_chat_name))
+            bot.send_message(last_chat_id, u'Добрый день, {}'.format(last_chat_name))
             today += 1
 
         elif last_chat_text.lower() in greetings and today == now.day and 17 <= hour < 23:
-            greet_bot.send_message(last_chat_id, 'Добрый вечер, {}'.format(last_chat_name))
+            bot.send_message(last_chat_id, u'Добрый вечер, {}'.format(last_chat_name))
             today += 1
 
         new_offset = last_update_id + 1
