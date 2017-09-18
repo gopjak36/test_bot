@@ -1,4 +1,4 @@
-Doc# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 import requests
 import datetime
 
@@ -50,10 +50,11 @@ def main():
         last_update_id = last_update['update_id']
         last_chat_text = last_update['message']['text']
         last_chat_id = last_update['message']['chat']['id']
+        last_chat_name = last_update['message']['chat']['first_name']
 
         bot.send_message(last_chat_id, u'{}\n(c){}'.format(
-                                                    last_chat_name,
-                                                    last_chat_text))
+                                                    last_chat_text,
+                                                    last_chat_name))
         new_offset = last_update_id + 1
 
 if __name__ == '__main__':
